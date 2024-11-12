@@ -13,6 +13,7 @@ export interface Product {
     name: string;
     price: number;
     prescription: boolean;
+    discount_price : number
   };
 }
 
@@ -86,6 +87,8 @@ const SliderUtil = ({ data }: { data: Array<Product> }) => {
             return (
               <ProductCard
                 key={index}
+                discount={((drug.product?.price - drug.product?.discount_price)/drug.product?.price ) * 100
+                }
                 id={drug.product?._id}
                 prescription={drug.product?.prescription}
                 drugName={drug.product?.name}
