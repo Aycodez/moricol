@@ -12,6 +12,7 @@ export interface productCategoryParams {
         name: string;
         coverimage: string;
         price: number;
+        discount_price: number;
       };
       _id: string;
       category: string;
