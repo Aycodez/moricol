@@ -1,10 +1,18 @@
+"use client";
 import TextInput from "@/components/auth/text-input";
 import Button from "@/components/button";
 import PageToolBar from "@/components/dashboard/pharmacy-page-toolbar";
 import FileInput from "@/components/file-input";
-import { prescription } from "../action";
+import { useRouter, useParams } from "next/navigation";
+import { routes } from "@/constants/routes";
 
 export default function Prescription() {
+  const router = useRouter();
+  const { id } = useParams();
+  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    router.push(routes.PHARMARCYPRODUCT + `/${id}`);
+  };
   return (
     <main>
       <PageToolBar />
@@ -15,13 +23,13 @@ export default function Prescription() {
           prescription from doctors about this particular medication
         </p>
 
-        <form action={prescription}>
+        <form>
           <div className="mb-8 grid gap-y-4">
             <TextInput name="" label="Provide your NIN" />
             <TextInput name="" label="Name of attachment" />
             <FileInput title="" />
           </div>
-          <Button>CONTINUE</Button>
+          <Button onClick={handleClick}>CONTINUE</Button>
         </form>
       </section>
     </main>

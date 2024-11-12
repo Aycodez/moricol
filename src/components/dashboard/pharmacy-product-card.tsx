@@ -13,6 +13,7 @@ export default function ProductCard({
   price,
   bestSelling,
   prescription,
+  discount,
 }: {
   id: string;
   drugName: string;
@@ -20,12 +21,13 @@ export default function ProductCard({
   imageUrl: string;
   bestSelling?: boolean;
   prescription: boolean;
+  discount: number;
 }) {
   const router = useRouter();
 
   const navigateToPrescriptionPageOrProductDetailsPage = () => {
     if (prescription) {
-      router.push(routes.PHARMARCYPRESCRIPTION);
+      router.push(routes.PHARMARCYPRESCRIPTION + `/${id}`);
     } else {
       router.push(routes.PHARMARCYPRODUCT + `/${id}`);
     }
@@ -60,20 +62,28 @@ export default function ProductCard({
         <p className="font-bold text-primary-500">{String(price)}</p>
       </div>
 
-      <DiscountBadge className="absolute -left-2 top-2" />
+      <DiscountBadge content={discount} className="absolute -left-2 top-2" />
     </article>
   );
 }
 
-function DiscountBadge({ className }: { className: string }) {
+function DiscountBadge({
+  className,
+  content,
+}: {
+  className: string;
+  content: number;
+}) {
   return (
-    <div
-      className={cn(
-        "rounded bg-[#F1CCCE] px-2 py-1 font-semibold text-secondary-400",
-        className,
-      )}
-    >
-      -200%
-    </div>
+    content != 0 && (
+      <div
+        className={cn(
+          "rounded bg-[#F1CCCE] px-2 py-1 font-semibold text-secondary-400",
+          className,
+        )}
+      >
+        -{String(Math.floor(content))}%
+      </div>
+    )
   );
 }
