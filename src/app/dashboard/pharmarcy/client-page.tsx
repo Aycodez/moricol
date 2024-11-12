@@ -139,10 +139,15 @@ export default function HomePage() {
         <div className="grid gap-5 py-3 lg:grid-cols-6">
           {newProducts?.data.map((drug, index) => {
             if (drug?.product) {
-              console.log(drug.product);
+              // console.log(drug.product);
               return (
                 <ProductCard
                   key={index}
+                  discount={
+                    ((drug.product?.price - drug.product?.discount_price) /
+                      drug.product?.price) *
+                    100
+                  }
                   id={drug.product?._id}
                   prescription={drug.product?.prescription}
                   drugName={drug.product?.name}
@@ -182,6 +187,11 @@ export default function HomePage() {
               return (
                 <ProductCard
                   key={index}
+                  discount={
+                    ((drug.product?.price - drug.product?.discount_price) /
+                      drug.product?.price) *
+                    100
+                  }
                   id={drug.product?._id}
                   prescription={drug.product?.prescription}
                   drugName={drug.product?.name}
