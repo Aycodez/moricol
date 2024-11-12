@@ -30,7 +30,6 @@ export default function SignupForm() {
     dob: "",
     religion: "",
     country: "",
-    address: "lagos, ph",
     state: "",
     language: "",
   });
