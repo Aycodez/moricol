@@ -1,7 +1,12 @@
+// 'use client'
+// import onlinePharmacyApi from "@/api/online-pharmacy";
+// import useFetch from "@/hooks/useFetch";
 import Image from "next/image";
 import Link from "next/link";
 
 export default function OnlinePharmarcy() {
+  // const { data: cats } = useFetch(onlinePharmacyApi.getAllCategories);
+  // console.log(cats)
   return (
     <>
       <header className="flex items-center justify-between gap-x-20 bg-[#2C315F] py-12 pl-20 text-white">

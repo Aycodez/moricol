@@ -1,10 +1,33 @@
+"use client";
 import { cn } from "@/util/cn";
 import Button from "../button";
 import { HeartSVG } from "../svgs";
 import { routes } from "@/constants/routes";
 import Link from "next/link";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import { SavedProducts } from "@/app/dashboard/pharmarcy/account/saved-items/page";
+import onlinePharmacyApi from "@/api/online-pharmacy";
 
 export default function PageToolBar() {
+  const { data: session } = useSession();
+  const [savedProducts, setSavedProducts] = useState<SavedProducts[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const response = await onlinePharmacyApi.getSavedProduct(
+        // @ts-expect-error: id is not found
+        session,
+        session?.user.id,
+      );
+      setSavedProducts(response.data);
+    };
+    fetchData();
+  }, [session]);
+  // console.log(savedProducts);
+  const cart = useSelector((state: RootState) => state.drugcart.cart);
   return (
     <section className="border-b-grey-300 flex items-center gap-x-10 border-b px-14 py-5">
       <form className="flex grow items-center gap-x-4">
@@ -21,11 +44,14 @@ export default function PageToolBar() {
       <div className="flex shrink-0 gap-x-7">
         <button className="relative">
           <HeartSVG />
-          <NumberBadge className="absolute -right-2 -top-1" />
+          <NumberBadge
+            qty={savedProducts.length}
+            className="absolute -right-2 -top-1"
+          />
         </button>
         <Link href={routes.PHARMARCYCART} className="relative">
           <CartSVG />
-          <NumberBadge className="absolute -right-2 -top-1" />
+          <NumberBadge qty={cart.length} className="absolute -right-2 -top-1" />
         </Link>
       </div>
     </section>
@@ -100,7 +126,7 @@ function CartSVG() {
   );
 }
 
-function NumberBadge({ className }: { className?: string }) {
+function NumberBadge({ className, qty }: { className?: string; qty?: number }) {
   return (
     <div
       className={cn(
@@ -108,7 +134,7 @@ function NumberBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      0
+      {qty ? String(qty) : "0"}
     </div>
   );
 }

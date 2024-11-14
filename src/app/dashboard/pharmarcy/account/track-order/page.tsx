@@ -1,4 +1,4 @@
-import SummaryProductCard from "@/components/dashboard/summary-product-card";
+// import SummaryProductCard from "@/components/dashboard/summary-product-card";
 import { TruckSvg } from "@/components/svgs";
 import { routes } from "@/constants/routes";
 import Image from "next/image";
@@ -141,11 +141,11 @@ export default function TrackOrder() {
         <h2 className="mb-5 text-xs font-bold text-primary-500">
           ITEMS IN YOUR ORDER
         </h2>
-        <div className="grid grid-cols-2 gap-7">
+        {/* <div className="grid grid-cols-2 gap-7">
           <SummaryProductCard />
           <SummaryProductCard />
           <SummaryProductCard />
-        </div>
+        </div> */}
       </section>
 
       <Link

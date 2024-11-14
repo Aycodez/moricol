@@ -1,8 +1,7 @@
 "use client";
 
-
-import SummaryProductCard from "@/components/dashboard/summary-product-card";
-import Quantity from "../../components/increase-decrese-quantity";
+// import SummaryProductCard from "@/components/dashboard/summary-product-card";
+// import Quantity from "../../components/increase-decrese-quantity";
 import SubmitProposal from "../../modals/refund-process";
 
 export default function ReturnProduct() {
@@ -47,7 +46,7 @@ export default function ReturnProduct() {
 
       <section className="mb-10">
         <h3 className="mb-4 font-bold text-primary-500">ITEMS IN YOUR ORDER</h3>
-        <ul className="grid gap-y-1.5">
+        {/* <ul className="grid gap-y-1.5">
           <li>
             <article className="rounded border border-gray-300 px-3.5 py-5">
               <SummaryProductCard />
@@ -55,7 +54,7 @@ export default function ReturnProduct() {
               <Quantity />
             </article>
           </li>
-        </ul>
+        </ul> */}
       </section>
 
       <div className="mb-3.5 flex gap-x-3.5">

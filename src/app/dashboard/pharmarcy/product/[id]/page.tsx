@@ -9,7 +9,10 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-
+import { useAppDispatch, useAppSelector } from "@/lib/hook";
+import { RootState } from "@/lib/store";
+import { addToCart, decrement, filterCart } from "@/lib/features/cartSlice";
+import { useSnackbar } from "notistack";
 interface Attributes {
   value: string;
   price: number;
@@ -32,6 +35,7 @@ export interface SingleProduct {
     description: string;
     images: Images[];
     name: string;
+    prescription: boolean;
     price: number;
     status: string;
     specification: string;
@@ -44,16 +48,66 @@ export interface SingleProduct {
 export default function ProductPage() {
   const { data: session } = useSession();
   const { id } = useParams();
+  const { enqueueSnackbar } = useSnackbar();
+  const dispatch = useAppDispatch();
+  const [loaded, setLoaded] = useState<boolean>(false);
+  const cart = useAppSelector((state: RootState) => state.drugcart.cart);
+  const [quantity, setQuantity] = useState<number>(0);
   const [drug, setDrug] = useState<SingleProduct | null>(null);
   useEffect(() => {
     const fetchData = async () => {
-      const response = await onlinePharmacyApi.getSingleProduct(session!, id);
-
-      setDrug(response.data);
+      await onlinePharmacyApi
+        .getSingleProduct(session!, id)
+        .then((res) => {
+          setDrug(res.data);
+          setLoaded(true);
+        })
+        .catch((err) => console.log(err));
+      //  .finally(() => setLoaded(true))
     };
     fetchData();
-  }, []);
-  // console.log(drug);
+    if (loaded) {
+      const index = cart.findIndex(
+        (item) => item.productid == drug?.product._id,
+      );
+      if (index != -1) setQuantity(cart[index].quantity!);
+    }
+  }, [session, loaded]);
+
+  const saveProduct = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    await onlinePharmacyApi
+      // @ts-expect-error: id is not found
+      .saveProduct(session!, session?.user.id, drug?.product._id)
+      .then(() => {
+        enqueueSnackbar("Saved successfully!", { variant: "success" });
+      })
+      .catch((err) => {
+        console.log(err);
+        enqueueSnackbar(err, { variant: "error" });
+      });
+  };
+
+  const handleDecrement = () => {
+    setQuantity(quantity == 0 ? quantity : quantity - 1);
+    dispatch(
+      decrement({
+        // @ts-expect-error: id is not found
+        price: drug?.product.price,
+        // @ts-expect-error: id is not found
+        subprice: drug?.product.discount_price,
+        // @ts-expect-error: id is not found
+        productid: drug?.product._id,
+        quantity: quantity - 1,
+        // @ts-expect-error: id is not found
+        coverimage: drug?.product.coverimage,
+        // @ts-expect-error: id is not found
+        name: drug?.product.name,
+      }),
+    );
+    dispatch(filterCart());
+    console.log("Decreased successfully");
+  };
 
   return (
     <main>
@@ -121,11 +175,19 @@ export default function ProductPage() {
 
             {/* Price */}
             <p className="mb-6 text-lg font-semibold">
-              <span className="mr-2 line-through">
-                ₦{String(drug?.product.price)}
-              </span>
+              {drug?.product.discount_price != drug?.product.price && (
+                <span className="mr-2 line-through">
+                  ₦{String(drug?.product.price)}
+                </span>
+              )}
+
               <span className="text-secondary-400">
-                ₦{String(drug?.product.discount_price)}
+                ₦
+                {String(
+                  drug?.product.discount_price == drug?.product.price
+                    ? drug?.product.price
+                    : drug?.product.discount_price,
+                )}
               </span>
             </p>
 
@@ -165,15 +227,70 @@ export default function ProductPage() {
             <div className="mb-6 flex items-center justify-between rounded border px-5 py-4">
               <p>Quantity</p>
               <div className="flex items-center gap-x-3 rounded border px-3.5 py-2 text-sm">
-                <button>-</button>
-                <p className="font-bold">1</p>
-                <button>+</button>
+                <button disabled={quantity == 0} onClick={handleDecrement}>
+                  -
+                </button>
+                <p className="font-bold">{String(quantity)}</p>
+                <button
+                  onClick={() => {
+                    setQuantity(quantity + 1);
+                    dispatch(
+                      addToCart({
+                        // @ts-expect-error: id is not found
+                        price: drug?.product.price,
+                        // @ts-expect-error: id is not found
+                        subprice: drug?.product.discount_price,
+                        // @ts-expect-error: id is not found
+                        productid: drug?.product._id,
+                        quantity: quantity + 1,
+                        // @ts-expect-error: id is not found
+                        coverimage: drug?.product.coverimage,
+                        // @ts-expect-error: id is not found
+                        name: drug?.product.name,
+                      }),
+                    );
+                    // console.log(cart);
+                  }}
+                >
+                  +
+                </button>
               </div>
-              <Button className="w-fit py-3 font-semibold">Add to cart</Button>
-              <div className="flex items-center gap-x-2">
+              <Button
+                disabled={quantity > 0}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (quantity == 0) {
+                    setQuantity(quantity + 1);
+                    dispatch(
+                      addToCart({
+                        // @ts-expect-error: id is not found
+                        price: drug?.product.price,
+                        // @ts-expect-error: id is not found
+                        subprice: drug?.product.discount_price,
+                        // @ts-expect-error: id is not found
+                        productid: drug?.product._id,
+                        quantity: quantity + 1,
+                        // @ts-expect-error: id is not found
+                        coverimage: drug?.product.coverimage,
+                        // @ts-expect-error: id is not found
+                        name: drug?.product.name,
+                      }),
+                    );
+                  }
+
+                  // console.log(cart);
+                }}
+                className="w-fit py-3 font-semibold"
+              >
+                Add to cart
+              </Button>
+              <button
+                onClick={saveProduct}
+                className="flex items-center gap-x-2"
+              >
                 <HeartSVG className="h-4 w-4" fill="black" />
                 <p className="text-[#2C2D33]">Add to WishList</p>
-              </div>
+              </button>
             </div>
 
             {/* Location */}

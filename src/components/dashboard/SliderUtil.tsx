@@ -13,11 +13,11 @@ export interface Product {
     name: string;
     price: number;
     prescription: boolean;
-    discount_price : number
+    discount_price: number;
   };
 }
 
-const NextArrow = ({ onClick }: { onClick?: () => void }) => {
+export const NextArrow = ({ onClick }: { onClick?: () => void }) => {
   return (
     <div className="absolute -right-5 top-20 z-[999] mb-5">
       <button
@@ -29,7 +29,7 @@ const NextArrow = ({ onClick }: { onClick?: () => void }) => {
     </div>
   );
 };
-const PrevArrow = ({ onClick }: { onClick?: () => void }) => {
+export const PrevArrow = ({ onClick }: { onClick?: () => void }) => {
   return (
     <div className="absolute top-20 z-[999] mb-5">
       <button
@@ -43,9 +43,8 @@ const PrevArrow = ({ onClick }: { onClick?: () => void }) => {
 };
 const SliderUtil = ({ data }: { data: Array<Product> }) => {
   const settings = {
-    arrows: true,
-    infinite: false,
-    slidesToShow: 6,
+    infinite: true,
+    slidesToShow: 5,
     slidesToScroll: 1,
     speed: 1000,
     autoplay: true,
@@ -53,20 +52,22 @@ const SliderUtil = ({ data }: { data: Array<Product> }) => {
     cssEase: "linear",
     nextArrow: <NextArrow />,
     prevArrow: <PrevArrow />,
-
+    initialSlide: 0,
     responsive: [
       {
         breakpoint: 1024,
         settings: {
-          slidesToShow: 6,
+          slidesToShow: 5,
           slidesToScroll: 1,
+          infiinite: true,
         },
       },
       {
         breakpoint: 600,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 2,
           slidesToScroll: 1,
+          initialSlide: 2,
         },
       },
       {
@@ -80,24 +81,46 @@ const SliderUtil = ({ data }: { data: Array<Product> }) => {
   };
 
   return (
-    <div className="relative w-full">
+    <div className="mx-auto w-full">
       <Slider {...settings}>
-        {data?.map((drug, index) => {
-          if (drug?.product) {
-            return (
-              <ProductCard
-                key={index}
-                discount={((drug.product?.price - drug.product?.discount_price)/drug.product?.price ) * 100
-                }
-                id={drug.product?._id}
-                prescription={drug.product?.prescription}
-                drugName={drug.product?.name}
-                imageUrl={drug.product?.coverimage}
-                price={drug.product?.price}
-              />
-            );
-          }
-        })}
+        {data.length >= 5
+          ? data?.map((drug, index) => {
+              if (drug?.product) {
+                return (
+                  <ProductCard
+                    key={index}
+                    discount={
+                      ((drug.product?.price - drug.product?.discount_price) /
+                        drug.product?.price) *
+                      100
+                    }
+                    id={drug.product?._id}
+                    prescription={drug.product?.prescription}
+                    drugName={drug.product?.name}
+                    imageUrl={drug.product?.coverimage}
+                    price={drug.product?.price}
+                  />
+                );
+              }
+            })
+          : Array(5)
+              .fill("")
+              .map((drug, index) => (
+                <ProductCard
+                  key={index}
+                  discount={
+                    ((data[0].product?.price -
+                      data[0].product?.discount_price) /
+                      data[0].product?.price) *
+                    100
+                  }
+                  id={data[0].product?._id}
+                  prescription={data[0].product?.prescription}
+                  drugName={data[0].product?.name}
+                  imageUrl={data[0].product?.coverimage}
+                  price={data[0].product?.price}
+                />
+              ))}
       </Slider>
     </div>
   );

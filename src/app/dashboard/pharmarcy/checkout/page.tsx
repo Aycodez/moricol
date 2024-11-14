@@ -1,12 +1,41 @@
+"use client";
+
 import Button from "@/components/button";
 import SummaryProductCard from "@/components/dashboard/summary-product-card";
-import { LocationSVG, OneUserSvg, PhoneSVG } from "@/components/svgs";
+
 import { routes } from "@/constants/routes";
 import Image from "next/image";
 import Link from "next/link";
-import EditOrAddAddress from "../modals/edit-or-add-address";
+
+import { useAppSelector } from "@/lib/hook";
+import { formatNaira } from "@/util/currency-format";
+import { calculateTotal } from "@/util/get-total";
+import { useEffect, useState } from "react";
+import { AddressParams } from "../account/addresses/page";
+import onlinePharmacyApi from "@/api/online-pharmacy";
+import { useSession } from "next-auth/react";
+import Address from "../components/Address";
 
 export default function Checkout() {
+  const { data: session } = useSession();
+  const [address, setAddress] = useState<AddressParams[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await onlinePharmacyApi
+        .getallAddress(
+          session!,
+          // @ts-expect-error: 'id' is not a property of 'session'
+          session?.user.id,
+        )
+        .then((s) => {
+          setAddress(s.data);
+        })
+        .catch((err) => console.log(err));
+    };
+    fetchData();
+  }, [session]);
+  const cart = useAppSelector((state) => state.drugcart.cart);
   return (
     <main className="px-8 py-6 pb-20">
       <section className="mb-9">
@@ -22,69 +51,27 @@ export default function Checkout() {
           <section className="mb-9">
             <div className="flex items-center justify-between border-b border-[#D2D2D2] pb-3">
               <h2 className="shrink-0 font-semibold text-primary-500">
-                Billing
-              </h2>
-            </div>
-            <div className="mb-4 flex items-start justify-between py-5">
-              <div>
-                <p className="mb-1.5 flex items-center gap-x-1 text-xs text-gray-500">
-                  <OneUserSvg /> C Darl Uzu
-                </p>
-                <p className="mb-1.5 flex items-center gap-x-1 text-xs text-gray-500">
-                  <LocationSVG fill={"#E29A13"} className="h-4 w-4" /> Court
-                  Estate, Durumi | Federal Capital Territory - ABUJA- DURUMI |
-                  900103
-                </p>
-                <p className="flex items-center gap-x-1 text-xs text-gray-500">
-                  <PhoneSVG /> +234 7035286570
-                </p>
-              </div>
-              <Button
-                className="w-fit py-2.5 text-xs font-bold"
-                variant="outline"
-              >
-                Change
-              </Button>
-            </div>
-
-            <article className="max-w-[320px] rounded border border-gray-300 p-5 text-xs space-y-3">
-              <p>Click on Add Address to add a new address</p>
-              {/* <Button className="mt-3 w-fit">Add Address</Button> */}
-              <EditOrAddAddress title="Add" />
-            </article>
-          </section>
-          <section className="mb-9">
-            <div className="flex items-center justify-between border-b border-[#D2D2D2] pb-3">
-              <h2 className="shrink-0 font-semibold text-primary-500">
                 Delivery Address
               </h2>
             </div>
-            <div className="mb-4 flex items-start justify-between py-5">
-              <div>
-                <p className="mb-1.5 flex items-center gap-x-1 text-xs text-gray-500">
-                  <OneUserSvg /> C Darl Uzu
-                </p>
-                <p className="mb-1.5 flex items-center gap-x-1 text-xs text-gray-500">
-                  <LocationSVG fill={"#E29A13"} className="h-4 w-4" /> Court
-                  Estate, Durumi | Federal Capital Territory - ABUJA- DURUMI |
-                  900103
-                </p>
-                <p className="flex items-center gap-x-1 text-xs text-gray-500">
-                  <PhoneSVG /> +234 7035286570
-                </p>
-              </div>
-              <Button
-                className="w-fit py-2.5 text-xs font-bold"
-                variant="outline"
-              >
-                Change
-              </Button>
+            <div className="mb-4 grid grid-cols-1 gap-y-4 py-5">
+              {address?.map((a, i) => (
+                <Address
+                  key={i}
+                  index={i}
+                  firstname={a.firstname}
+                  lastname={a.lastname}
+                  defaultaddress={a.defaultaddress}
+                  address={a.address}
+                  phone={a.phone}
+                  postalcode={a.postalcode}
+                  state={a.state}
+                  city={a.city}
+                  country={a.country}
+                  _id={a._id}
+                />
+              ))}
             </div>
-
-            <article className="max-w-[320px] rounded border border-gray-300 p-5 text-xs">
-              <p>Click on Add Address to add a new address</p>
-              <Button className="mt-3 w-fit">Add Address</Button>
-            </article>
           </section>
           <section>
             <div className="mb-6 flex items-center justify-between border-b border-[#D2D2D2] pb-3">
@@ -108,22 +95,6 @@ export default function Checkout() {
                 PayStack
               </label>
             </div>
-
-            {/* <div className="mt-3.5 flex items-center gap-x-2">
-              <input type="radio" id="paystack" />
-              <label htmlFor="paystack" className="flex items-center gap-x-0.5">
-                <div className="relative h-3.5 w-3.5 overflow-hidden">
-                  <Image
-                    src="/images/flutter.png"
-                    alt=""
-                    fill
-                    sizes="14px"
-                    className="h-auto w-3.5"
-                  />
-                </div>
-                Flutterwave
-              </label>
-            </div> */}
           </section>
         </section>
         <section className="grid w-[372px] shrink-0 gap-y-2">
@@ -133,21 +104,28 @@ export default function Checkout() {
 
           <article className="rounded border border-[#9F9FA0] bg-gray-100">
             <div className="grid gap-y-5 px-5 py-6">
-              <SummaryProductCard />
-              <SummaryProductCard />
+              {cart.map((product, i) => (
+                <SummaryProductCard
+                  key={i}
+                  name={product.name}
+                  imageUrl={product.coverimage}
+                  qty={product.quantity}
+                  price={product.subprice}
+                />
+              ))}
             </div>
 
             <div className="gap-y-2.5 border-y border-y-gray-300 px-6 py-6 text-primary-500">
               <p className="flex justify-between">
-                Subtotal <span>₦1,374</span>
+                Subtotal <span>{formatNaira(calculateTotal(cart))}</span>
               </p>
               <p className="flex justify-between">
-                Delivery Fees <span>₦210</span>
+                Delivery Fees <span>₦210 Come back to this</span>
               </p>
             </div>
             <div className="px-5 py-6">
               <p className="flex justify-between font-bold text-primary-500">
-                Total <span>₦210</span>
+                Total <span>{formatNaira(calculateTotal(cart))}</span>
               </p>
             </div>
           </article>

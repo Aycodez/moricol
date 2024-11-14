@@ -1,10 +1,9 @@
 "use client";
-import { FilterProvider } from "@/lib/FilterContext";
-import { CartProvider } from "@/lib/CartContext";
 
 import DashboardLayout from "@/components/dashboard/dashboard-layout";
 import { MenuSVG } from "@/components/svgs";
 import { routes } from "@/constants/routes";
+import StoreProvider from "./StoreProvider";
 
 const links = [
   { name: "Home", link: routes.PHARMARCYDASHBOARD, SVGComponent: MenuSVG },
@@ -37,10 +36,8 @@ export default function PharmarcyLayout({
   children: React.ReactNode;
 }) {
   return (
-    <CartProvider>
-      <FilterProvider>
-        <DashboardLayout asideLinks={links}>{children}</DashboardLayout>;
-      </FilterProvider>
-    </CartProvider>
+    <StoreProvider>
+      <DashboardLayout asideLinks={links}>{children}</DashboardLayout>;
+    </StoreProvider>
   );
 }

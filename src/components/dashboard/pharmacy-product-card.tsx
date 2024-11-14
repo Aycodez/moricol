@@ -35,10 +35,12 @@ export default function ProductCard({
 
   return (
     <article
-      className="relative max-w-[151.24px] cursor-pointer text-center"
+      // className="relative max-w-[151.24px] cursor-pointer text-center"
+      className="relative ml-5 cursor-pointer text-center"
       onClick={navigateToPrescriptionPageOrProductDetailsPage}
     >
-      <div className="relative h-[214.51px] w-[151.24px] overflow-hidden">
+      <div className="relative h-[214.51px] overflow-hidden px-5">
+        {/* <div className="relative h-[214.51px] w-[151.24px] overflow-hidden"> */}
         <Image
           src={imageUrl}
           alt="Doctor profile"

@@ -1,7 +1,46 @@
-import { LocationSVG, PhoneSVG, SingleUserSvg } from "@/components/svgs";
+"use client";
+import { useState, useEffect } from "react";
+// import { LocationSVG, PhoneSVG, SingleUserSvg } from "@/components/svgs";
 import EditOrAddAddress from "../../modals/edit-or-add-address";
+import onlinePharmacyApi from "@/api/online-pharmacy";
+import { useSession } from "next-auth/react";
+import Address from "../../components/Address";
 
+export interface AddressParams {
+  address: string;
+  firstname: string;
+  lastname: string;
+  phone: string;
+  defaultaddress: boolean;
+  country: string;
+  city: string;
+  state: string;
+  postalcode: string;
+  index: number;
+  email?: string;
+  _id?: string;
+}
 export default function Addresses() {
+  const { data: session } = useSession();
+  const [address, setAddress] = useState<AddressParams[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      await onlinePharmacyApi
+        .getallAddress(
+          session!,
+          // @ts-expect-error: 'id' is not a property of 'session'
+          session?.user.id,
+        )
+        .then((s) => {
+          setAddress(s.data);
+        })
+        .catch((err) => console.log(err));
+    };
+    fetchData();
+  }, [session]);
+  // console.log(address);
+
   return (
     <section className="rounded border border-gray-300">
       <div className="border-b border-gray-300 pt-5">
@@ -11,47 +50,28 @@ export default function Addresses() {
       </div>
 
       <ul className="grid gap-y-10 px-8 py-10">
-        <li>
-          <Address />
-        </li>
+        {address?.map((a, i) => (
+          <li key={i}>
+            <Address
+              index={i}
+              firstname={a.firstname}
+              lastname={a.lastname}
+              defaultaddress={a.defaultaddress}
+              address={a.address}
+              phone={a.phone}
+              postalcode={a.postalcode}
+              state={a.state}
+              city={a.city}
+              country={a.country}
+              _id={a._id}
+            />
+          </li>
+        ))}
+
         <li className="border-t border-t-[#9F9FA0] pt-8">
           <EditOrAddAddress title="New" />
         </li>
       </ul>
     </section>
-  );
-}
-
-function Address() {
-  return (
-    <article>
-      <h3 className="mb-5 border-b border-b-[#9F9FA0] pb-3.5 text-xs font-bold text-primary-500">
-        Address 1
-      </h3>
-      <div className="flex items-center justify-between">
-        <div className="grid gap-y-1.5 text-xs text-[#636985]">
-          <p className="flex items-center gap-x-1 font-bold">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <SingleUserSvg />
-            </span>
-            C Darl Uzu
-          </p>
-          <p className="flex items-center gap-x-1">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <LocationSVG fill="#E29A13" className="h-4 w-4" />
-            </span>
-            Court Estate, Durumi | Federal Capital Territory - ABUJA- DURUMI |
-            900103
-          </p>
-          <p className="flex items-center gap-x-1">
-            <span className="flex h-3.5 w-3.5 items-center justify-center">
-              <PhoneSVG />
-            </span>
-            +234 7035286570
-          </p>
-        </div>
-        <EditOrAddAddress title="Edit" />
-      </div>
-    </article>
   );
 }

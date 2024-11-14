@@ -531,13 +531,12 @@ export const trainingDashboardProfileLinks = [
   },
 ];
 
-
 export const servicesDashboardLinks = [
-  { name: 'Telemedicine', path: routes.TELEMEDICINE_DASHBOARD },
-  { name: 'Pharmacy', path: routes.PHARMARCYDASHBOARD },
-  { name: 'Massage', path: routes.MASSAGEDASHBOARDHOME },
-  { name: 'Home Care', path: routes.HOMECAREDASHBOARDHOME },
-  { name: 'Training', path: routes.TRAININGDASHBOARD },
-  { name: 'Recruitment', path: routes.RECRUITMENTDASHBOARD },
-  { name: 'Loan', path: routes.LOANDASHBOARDHOME }
-]
+  { name: "Telemedicine", path: routes.TELEMEDICINE_DASHBOARD },
+  { name: "Pharmacy", path: routes.PHARMARCYDASHBOARD },
+  { name: "Massage", path: routes.MASSAGEDASHBOARDHOME },
+  { name: "Home Care", path: routes.HOMECAREDASHBOARDHOME },
+  { name: "Training", path: routes.TRAININGDASHBOARD },
+  { name: "Recruitment", path: routes.RECRUITMENTDASHBOARD },
+  { name: "Loan", path: routes.LOANDASHBOARDHOME },
+];

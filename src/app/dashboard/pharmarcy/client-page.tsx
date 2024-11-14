@@ -3,6 +3,9 @@
 import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/util/cn";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 import Button from "@/components/button";
 import PageToolBar from "@/components/dashboard/pharmacy-page-toolbar";
 import ProductCard from "@/components/dashboard/pharmacy-product-card";
@@ -13,7 +16,6 @@ import {
 import useFetch from "@/hooks/useFetch";
 import onlinePharmacyApi from "@/api/online-pharmacy";
 import SliderUtil from "@/components/dashboard/SliderUtil";
-
 export default function HomePage() {
   const { data: bestProducts } = useFetch(onlinePharmacyApi.getBestProducts);
   const { data: newProducts } = useFetch(onlinePharmacyApi.getNewProducts);
@@ -28,38 +30,70 @@ export default function HomePage() {
     setNewProducts(false);
   };
   function Header() {
+    const dashboardCarouselSettings = {
+      infinite: true,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      speed: 1000,
+      autoplay: true,
+      autoplaySpeed: 5000,
+      cssEase: "linear",
+      initialSlide: 0,
+      // nextArrow: (
+      //   <NextArrow />
+      //   // <SliderNextButton className="absolute -right-5 top-1/2 -translate-y-1/2 border-2 border-white bg-primary-500" />
+      // ),
+      // prevArrow: (
+      //   <PrevArrow />
+
+      //   // <SliderPrevButton className="absolute -left-5 top-1/2 -translate-y-1/2 border-2 border-white bg-primary-500" />
+      // ),
+    };
+
     return (
-      <section className="relative flex h-[282px] items-center rounded-2xl bg-[#212844] text-white">
-        <div className="ml-16 max-w-[339px]">
-          <h1 className="mb-4 text-xl">
-            Get the best of services with Moricol Online Pharmacy
-          </h1>
-          <ul>
-            <li className="flex items-center gap-x-3 text-2xl font-bold">
-              <BulletPoint />
-              Medications
-            </li>
-            <li className="flex items-center gap-x-3 text-2xl font-bold">
-              <BulletPoint />
-              All Consumables
-            </li>
-          </ul>
-        </div>
+      <div className="w-full max-w-[870px]">
+        <Slider {...dashboardCarouselSettings}>
+          {Array(3)
+            .fill("")
+            .map(() => (
+              <section
+                key={Math.random() * 5}
+                className="relative flex h-[282px] items-center rounded-2xl bg-[#212844] text-white"
+              >
+                <div className="ml-16 mt-8 max-w-[339px]">
+                  <h1 className="mb-4 text-xl">
+                    Get the best of services with Moricol Online Pharmacy
+                  </h1>
+                  <ul>
+                    <li className="flex items-center gap-x-3 text-2xl font-bold">
+                      <BulletPoint />
+                      Medications
+                    </li>
+                    <li className="flex items-center gap-x-3 text-2xl font-bold">
+                      <BulletPoint />
+                      All Consumables
+                    </li>
+                  </ul>
+                </div>
 
-        <BackgroundIllustrationSVG className="absolute bottom-0 right-4" />
+                <BackgroundIllustrationSVG className="absolute bottom-0 right-4" />
 
-        <Image
-          src="/images/dashboard/female-doctor-looking-her-hand.png"
-          alt="a female doctor looking at her hand"
-          height={302}
-          width={523}
-          className="absolute bottom-0 right-0 z-10"
-        />
+                <Image
+                  src="/images/dashboard/female-doctor-looking-her-hand.png"
+                  alt="a female doctor looking at her hand"
+                  height={302}
+                  width={523}
+                  className="absolute bottom-0 right-0 z-10"
+                />
 
-        <SliderIndicator className="absolute bottom-6 left-16" />
-        <SliderNextButton className="absolute -right-5 top-1/2 -translate-y-1/2 border-2 border-white bg-primary-500" />
-        <SliderPrevButton className="absolute -left-5 top-1/2 -translate-y-1/2 border-2 border-white bg-primary-500" />
-      </section>
+                <SliderIndicator className="absolute bottom-6 left-16" />
+              </section>
+            ))}
+        </Slider>
+        <SliderNextButton className="absolute right-10 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
+
+        <SliderPrevButton className="absolute left-8 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
+      </div>
     );
   }
 
@@ -211,7 +245,7 @@ export default function HomePage() {
       <PageToolBar />
 
       {!shownewProducts && !showbestSellingProducts && (
-        <section className="grid gap-y-9 px-16 py-8">
+        <section className="grid gap-y-9 px-16 py-8 pr-10">
           <Header />
 
           <section>
@@ -227,7 +261,7 @@ export default function HomePage() {
                 View All
               </Button>
             </div>
-            <div className="w-full">
+            <div className="w-full max-w-[900px] pt-5">
               {newProducts?.data && <SliderUtil data={newProducts.data} />}
             </div>
           </section>
@@ -245,7 +279,7 @@ export default function HomePage() {
                 View All
               </Button>
             </div>
-            <div className="w-full">
+            <div className="w-full max-w-[1200px] pt-5">
               {bestProducts?.data && <SliderUtil data={bestProducts.data} />}
             </div>
           </section>
