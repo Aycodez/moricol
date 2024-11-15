@@ -16,9 +16,14 @@ import {
 import useFetch from "@/hooks/useFetch";
 import onlinePharmacyApi from "@/api/online-pharmacy";
 import SliderUtil from "@/components/dashboard/SliderUtil";
+import { Loader } from "lucide-react";
 export default function HomePage() {
-  const { data: bestProducts } = useFetch(onlinePharmacyApi.getBestProducts);
-  const { data: newProducts } = useFetch(onlinePharmacyApi.getNewProducts);
+  const { data: bestProducts, loading: bloading } = useFetch(
+    onlinePharmacyApi.getBestProducts,
+  );
+  const { data: newProducts, loading: nloading } = useFetch(
+    onlinePharmacyApi.getNewProducts,
+  );
 
   const [showbestSellingProducts, setBestSellingProducts] = useState(false);
   const [shownewProducts, setNewProducts] = useState(false);
@@ -90,9 +95,9 @@ export default function HomePage() {
               </section>
             ))}
         </Slider>
-        <SliderNextButton className="absolute right-10 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
+        <SliderNextButton className="absolute right-16 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
 
-        <SliderPrevButton className="absolute left-8 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
+        <SliderPrevButton className="absolute left-10 top-80 z-[999] mb-5 border-2 border-white bg-primary-500" />
       </div>
     );
   }
@@ -170,28 +175,32 @@ export default function HomePage() {
             Back
           </Button>
         </div>
-        <div className="grid gap-5 py-3 lg:grid-cols-6">
-          {newProducts?.data.map((drug, index) => {
-            if (drug?.product) {
-              // console.log(drug.product);
-              return (
-                <ProductCard
-                  key={index}
-                  discount={
-                    ((drug.product?.price - drug.product?.discount_price) /
-                      drug.product?.price) *
-                    100
-                  }
-                  id={drug.product?._id}
-                  prescription={drug.product?.prescription}
-                  drugName={drug.product?.name}
-                  imageUrl={drug.product?.coverimage}
-                  price={drug.product?.price}
-                />
-              );
-            }
-          })}
-        </div>
+        {nloading ? (
+          <Loader className="h-7 w-7 animate-spin" />
+        ) : (
+          <div className="grid gap-5 py-3 lg:grid-cols-6">
+            {newProducts?.data.map((drug, index) => {
+              if (drug?.product) {
+                // console.log(drug.product);
+                return (
+                  <ProductCard
+                    key={index}
+                    discount={
+                      ((drug.product?.price - drug.product?.discount_price) /
+                        drug.product?.price) *
+                      100
+                    }
+                    id={drug.product?._id}
+                    prescription={drug.product?.prescription}
+                    drugName={drug.product?.name}
+                    imageUrl={drug.product?.coverimage}
+                    price={drug.product?.price}
+                  />
+                );
+              }
+            })}
+          </div>
+        )}
       </section>
     );
   }
@@ -215,27 +224,31 @@ export default function HomePage() {
             Back
           </Button>
         </div>
-        <div className="grid justify-between gap-5 py-3 lg:grid-cols-6">
-          {bestProducts?.data.map((drug, index) => {
-            if (drug?.product) {
-              return (
-                <ProductCard
-                  key={index}
-                  discount={
-                    ((drug.product?.price - drug.product?.discount_price) /
-                      drug.product?.price) *
-                    100
-                  }
-                  id={drug.product?._id}
-                  prescription={drug.product?.prescription}
-                  drugName={drug.product?.name}
-                  imageUrl={drug.product?.coverimage}
-                  price={drug.product?.price}
-                />
-              );
-            }
-          })}
-        </div>
+        {bloading ? (
+          <Loader className="h-7 w-7 animate-spin" />
+        ) : (
+          <div className="grid justify-between gap-5 py-3 lg:grid-cols-6">
+            {bestProducts?.data.map((drug, index) => {
+              if (drug?.product) {
+                return (
+                  <ProductCard
+                    key={index}
+                    discount={
+                      ((drug.product?.price - drug.product?.discount_price) /
+                        drug.product?.price) *
+                      100
+                    }
+                    id={drug.product?._id}
+                    prescription={drug.product?.prescription}
+                    drugName={drug.product?.name}
+                    imageUrl={drug.product?.coverimage}
+                    price={drug.product?.price}
+                  />
+                );
+              }
+            })}
+          </div>
+        )}
       </section>
     );
   }
@@ -261,9 +274,13 @@ export default function HomePage() {
                 View All
               </Button>
             </div>
-            <div className="w-full max-w-[900px] pt-5">
-              {newProducts?.data && <SliderUtil data={newProducts.data} />}
-            </div>
+            {nloading ? (
+              <Loader className="h-7 w-7 animate-spin" />
+            ) : (
+              <div className="w-full max-w-[900px] pt-5">
+                {newProducts?.data && <SliderUtil data={newProducts.data} />}
+              </div>
+            )}
           </section>
 
           <section>
@@ -279,9 +296,13 @@ export default function HomePage() {
                 View All
               </Button>
             </div>
-            <div className="max-w-screen w-full pt-5 lg:max-w-[900px]">
-              {bestProducts?.data && <SliderUtil data={bestProducts.data} />}
-            </div>
+            {bloading ? (
+              <Loader className="h-7 w-7 animate-spin" />
+            ) : (
+              <div className="max-w-screen w-full pt-5 lg:max-w-[900px]">
+                {bestProducts?.data && <SliderUtil data={bestProducts.data} />}
+              </div>
+            )}
           </section>
         </section>
       )}
