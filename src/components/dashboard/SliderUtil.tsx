@@ -83,7 +83,7 @@ const SliderUtil = ({ data }: { data: Array<Product> }) => {
   return (
     <div className="mx-auto w-full">
       <Slider {...settings}>
-        {data.length >= 5
+        {data.length > 5
           ? data?.map((drug, index) => {
               if (drug?.product) {
                 return (
@@ -105,9 +105,9 @@ const SliderUtil = ({ data }: { data: Array<Product> }) => {
             })
           : Array(5)
               .fill("")
-              .map((drug, index) => (
+              .map(() => (
                 <ProductCard
-                  key={index}
+                  key={Math.random() * 10}
                   discount={
                     ((data[0].product?.price -
                       data[0].product?.discount_price) /

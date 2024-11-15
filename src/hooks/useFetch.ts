@@ -23,7 +23,7 @@ export interface productCategoryParams {
 interface FetchState<productCategoryParams> {
   data: productCategoryParams | null;
   loading: boolean;
-  error: string | null;
+  // error: string | null;
 }
 
 function useFetch<productCategoryParams>(
@@ -32,27 +32,33 @@ function useFetch<productCategoryParams>(
   const { data: session } = useSession();
   const [data, setData] = useState<productCategoryParams | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        setLoading(true);
-        const responseData = await fetchFunction(session!);
-        setData(responseData);
-      } catch (err) {
-        setError(
-          err instanceof Error ? err.message : "An unexpected error occurred",
-        );
-      } finally {
-        setLoading(false);
-      }
+      setLoading(true);
+      await fetchFunction(session!)
+        .then((res) => setData(res))
+        .catch((err) =>
+          console.log(
+            err instanceof Error ? err.message : "An unexpected error occurred",
+          ),
+        )
+        .finally(() => setLoading(false));
+
+      // } catch (err) {
+      //   // setError(
+      //   //   err instanceof Error ? err.message : "An unexpected error occurred",
+      //   // );
+      // } finally {
+
+      // }
     };
 
     fetchData();
   }, [fetchFunction, session]);
 
-  return { data, loading, error };
+  return { data, loading };
 }
 
 export default useFetch;
